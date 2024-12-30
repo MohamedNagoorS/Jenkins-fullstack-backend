@@ -1,13 +1,14 @@
 pipeline {
     agent any
-    tools{
-        nodejs 'sonarnode'
+
+    tools {
+        nodejs 'sonarnode'  
     }
     
     environment {
         NODE_VERSION = '23'
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
@@ -15,43 +16,31 @@ pipeline {
             }
         }
         
-         stage('Install') {
+        stage('Install') {
             steps {
-                 
-                    bat '''npm install
-                    npm run lint'''
-                
+                bat '''npm install
+                npm run lint'''  
             }
         }
-        
-        
-        
-        
-        stage('Build') {
+
+        // Removed Build stage as it is not needed for backend
+        stage('SonarAnalysis') {
+            environment {
+                SONAR_TOKEN = credentials('sonarqube-token')  
+            }
             steps {
-                
-                bat '''npm run build'''
-            
-            }
-        }
-        stage('SonarAnalysis'){
-            environment{
-                SONAR_TOKEN=credentials('sonarqube-token')
-            }
-             steps{
                 bat '''
-               sonar-scanner.bat -D"sonar.projectKey=backend" -D"sonar.sources=." -D"sonar.host.url=http://localhost:9000" -D"sonar.token=sqp_48eaea52f16c865f2f4183dcd5f0a97f21b3d43b"
+                sonar-scanner.bat -D"sonar.projectKey=backend" -D"sonar.sources=." -D"sonar.host.url=http://localhost:9000" -D"sonar.token=${SONAR_TOKEN}"
                 '''
             }
-       
-        }}
-    
-    
+        }
+    }
+
     post {
-        success{
+        success {
             echo "DONE SUCCESSFULLY"
         }
-        failure{
+        failure {
             echo "SOMETHING IS WRONG"
         }
     }
