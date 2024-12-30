@@ -30,7 +30,7 @@ pipeline {
             }
             steps {
                 bat '''
-                sonar-scanner.bat 
+                sonar-scanner ^
                 -Dsonar.projectKey=backend ^
                 -Dsonar.sources=. ^
                 -Dsonar.host.url=http://localhost:9000 ^
